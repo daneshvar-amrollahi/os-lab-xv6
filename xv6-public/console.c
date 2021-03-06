@@ -15,6 +15,9 @@
 #include "proc.h"
 #include "x86.h"
 
+#define KEY_LF          0xE4
+#define KEY_RT          0xE5
+
 static void consputc(int);
 
 static int panicked = 0;
@@ -128,6 +131,8 @@ panic(char *s)
 #define CRTPORT 0x3d4
 static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
 
+int back_counter = 0;
+
 static void
 cgaputc(int c)
 {
@@ -142,10 +147,18 @@ cgaputc(int c)
   if(c == '\n')
     pos += 80 - pos%80;
   else if(c == BACKSPACE){
+    for (int i = pos - 1 ; i < pos + back_counter ; i++)
+      crt[i] = crt[i + 1];
+
     if(pos > 0) --pos;
   } else
-    crt[pos++] = (c&0xff) | 0x0700;  // black on white
-
+  {
+    for (int i = pos + back_counter - 1 ; i > pos ; i--)
+      crt[i] = crt[i - 1];
+      
+    crt[pos] = (c&0xff) | 0x0700;  // black on white
+    pos++;
+  }
   if(pos < 0 || pos > 25*80)
     panic("pos under/overflow");
 
@@ -159,7 +172,8 @@ cgaputc(int c)
   outb(CRTPORT+1, pos>>8);
   outb(CRTPORT, 15);
   outb(CRTPORT+1, pos);
-  crt[pos] = ' ' | 0x0700;
+  crt[pos + back_counter] = ' ' | 0x0700;
+  //crt[pos] = ' ' | 0x0700;
 }
 
 void
@@ -188,6 +202,149 @@ struct {
 
 #define C(x)  ((x)-'@')  // Control-x
 
+void move_left_cursor(){
+  int pos;
+
+  // get cursor position
+  outb(CRTPORT, 14);
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);
+
+  // move back
+  pos--;
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+  //crt[pos] = ' ' | 0x0700;
+}
+
+void move_right_cursor(){
+  int pos;
+
+  // get cursor position
+  outb(CRTPORT, 14);
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);
+
+  // move forward
+  pos++;
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+  //crt[pos] = ' ' | 0x0700;
+}
+
+int isDelimeter(char c)
+{
+  if (c == ' ' || c == '.' || c == ',' || c == ':' || c == ';')
+    return 1;
+  return 0;
+}
+
+void jump_left_cursor()
+{
+  
+    int pos;
+  
+  // get cursor position
+  outb(CRTPORT, 14);                  
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);    
+
+  int npos = pos;
+  for (int i = pos - 2 ; i >= 0 ; i--)
+    if (isDelimeter(crt[i]))
+    {
+      npos = i;
+      break;
+    }
+  back_counter += (pos - npos - 1);
+  pos = npos + 1;
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+}
+
+void jump_right_cursor()
+{
+
+      int pos;
+  
+  // get cursor position
+  outb(CRTPORT, 14);                  
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);    
+
+  int npos = pos;
+  for (int i = pos + 1 ; !isDelimeter(crt[i]) ; i++)
+    npos = i;
+  
+  //back_counter += (npos - pos - 1);
+  //pos = npos + 1;
+  back_counter -= (npos + 1 - pos);
+  pos = npos + 1;
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+}
+
+void delete_line_until_here()
+{
+    int pos;
+  
+  // get cursor position
+  outb(CRTPORT, 14);                  
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);       
+
+  
+
+  int idx = pos;
+  int npos = pos;
+  for (int i = pos - 1 ; i >= 0 ; i--)
+    if (crt[i] == ('$' | 0x0700))
+    {
+      npos = i + 2;
+      idx = i + 2;
+      break;
+    }
+  
+    
+  int p = pos;
+  while (p < pos + back_counter)
+    crt[idx++] = crt[p++];
+
+  while (idx < pos + back_counter)
+    crt[idx++] = ' ' | 0x0700;
+  
+  pos = npos;
+  
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+}
+
+
 void
 consoleintr(int (*getc)(void))
 {
@@ -196,6 +353,29 @@ consoleintr(int (*getc)(void))
   acquire(&cons.lock);
   while((c = getc()) >= 0){
     switch(c){
+
+    case KEY_LF:
+      move_left_cursor();
+      back_counter++;
+      break;
+
+    case KEY_RT:
+      move_right_cursor();
+      back_counter--;
+      break;
+
+    case C('K'):
+      jump_left_cursor();
+      break;
+
+    case C('L'):
+      jump_right_cursor();
+      break;
+
+    case C('I'):
+      delete_line_until_here();
+      break;
+
     case C('P'):  // Process listing.
       // procdump() locks cons.lock indirectly; invoke later
       doprocdump = 1;
@@ -296,4 +476,3 @@ consoleinit(void)
 
   ioapicenable(IRQ_KBD, 0);
 }
-
