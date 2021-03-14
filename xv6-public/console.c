@@ -153,9 +153,9 @@ cgaputc(int c)
     if(pos > 0) --pos;
   } else
   {
-    for (int i = pos + back_counter - 1 ; i > pos ; i--)
+    for (int i = pos + back_counter; i > pos ; i--)
       crt[i] = crt[i - 1];
-      
+
     crt[pos] = (c&0xff) | 0x0700;  // black on white
     pos++;
   }
@@ -212,7 +212,8 @@ void move_left_cursor(){
   pos |= inb(CRTPORT+1);
 
   // move back
-  pos--;
+  if(crt[pos - 2] != ('$' | 0x0700))
+    pos--;
 
   // reset cursor
   outb(CRTPORT, 14);
@@ -251,14 +252,17 @@ int isDelimeter(char c)
 
 void jump_left_cursor()
 {
-  
+
     int pos;
-  
+
   // get cursor position
-  outb(CRTPORT, 14);                  
+  outb(CRTPORT, 14);
   pos = inb(CRTPORT+1) << 8;
   outb(CRTPORT, 15);
-  pos |= inb(CRTPORT+1);    
+  pos |= inb(CRTPORT+1);
+
+  if(crt[pos - 2] == ('$' | 0x0700))
+    return;
 
   int npos = pos;
   for (int i = pos - 2 ; i >= 0 ; i--)
@@ -281,17 +285,17 @@ void jump_right_cursor()
 {
 
       int pos;
-  
+
   // get cursor position
-  outb(CRTPORT, 14);                  
+  outb(CRTPORT, 14);
   pos = inb(CRTPORT+1) << 8;
   outb(CRTPORT, 15);
-  pos |= inb(CRTPORT+1);    
+  pos |= inb(CRTPORT+1);
 
   int npos = pos;
   for (int i = pos + 1 ; !isDelimeter(crt[i]) ; i++)
     npos = i;
-  
+
   //back_counter += (npos - pos - 1);
   //pos = npos + 1;
   back_counter -= (npos + 1 - pos);
@@ -307,14 +311,14 @@ void jump_right_cursor()
 void delete_line_until_here()
 {
     int pos;
-  
+
   // get cursor position
-  outb(CRTPORT, 14);                  
+  outb(CRTPORT, 14);
   pos = inb(CRTPORT+1) << 8;
   outb(CRTPORT, 15);
-  pos |= inb(CRTPORT+1);       
+  pos |= inb(CRTPORT+1);
 
-  
+
 
   int idx = pos;
   int npos = pos;
@@ -325,17 +329,17 @@ void delete_line_until_here()
       idx = i + 2;
       break;
     }
-  
-    
+
+
   int p = pos;
   while (p < pos + back_counter)
     crt[idx++] = crt[p++];
 
   while (idx < pos + back_counter)
     crt[idx++] = ' ' | 0x0700;
-  
+
   pos = npos;
-  
+
 
   // reset cursor
   outb(CRTPORT, 14);
@@ -360,8 +364,10 @@ consoleintr(int (*getc)(void))
       break;
 
     case KEY_RT:
-      move_right_cursor();
-      back_counter--;
+      if(back_counter != 0){
+        move_right_cursor();
+        back_counter--;
+      }
       break;
 
     case C('K'):
@@ -369,8 +375,11 @@ consoleintr(int (*getc)(void))
       break;
 
     case C('L'):
-      jump_right_cursor();
+      if(back_counter != 0){
+        jump_right_cursor();
+      }
       break;
+
 
     case C('I'):
       delete_line_until_here();
