@@ -532,3 +532,13 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int calculate_biggest_perfect_square(int n)
+{
+    int ans = 1;
+    while (ans * ans < n)
+      ans++;
+    ans--;
+  
+    return ans * ans;
+}

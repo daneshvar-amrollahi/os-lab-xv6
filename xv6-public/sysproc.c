@@ -89,3 +89,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_calculate_biggest_perfect_square(void)
+{
+  int number = myproc()->tf->ebx; //register after eax
+  cprintf("Kernel: sys_calculate_biggest_perfect_square() called for number %d\n", number);
+  return calculate_biggest_perfect_square(number);
+}

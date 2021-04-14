@@ -120,6 +120,7 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             calculate_biggest_perfect_square(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
