@@ -21,3 +21,4 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_calculate_biggest_perfect_square    22
+#define SYS_get_ancestors   23

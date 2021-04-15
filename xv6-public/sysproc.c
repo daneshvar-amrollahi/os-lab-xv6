@@ -97,3 +97,11 @@ sys_calculate_biggest_perfect_square(void)
   cprintf("Kernel: sys_calculate_biggest_perfect_square() called for number %d\n", number);
   return calculate_biggest_perfect_square(number);
 }
+
+void
+sys_get_ancestors(void)
+{
+  int pid = myproc()->tf->ebx; 
+  cprintf("Kernel: sys_get_ancesrots() called for pid %d\n", pid);
+  get_ancestors(pid);
+}

@@ -542,3 +542,29 @@ int calculate_biggest_perfect_square(int n)
   
     return ans * ans;
 }
+
+void get_ancestors(int pid)
+{ 
+    struct proc *p;
+
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+      if (p->pid == pid)
+        break;
+    }
+
+    while (p->pid != 1)
+    {
+      cprintf("my id: %d, ", p->pid);
+      cprintf("my parent id: %d\n ", p->parent->pid);
+
+      p = p->parent;
+    }  
+
+    //cprintf("my parent id: %d\n ", p->parent->pid);
+    
+    release(&ptable.lock);
+
+    //pid = p->parent->pid;
+
+}
