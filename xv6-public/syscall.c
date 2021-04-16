@@ -105,6 +105,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_calculate_biggest_perfect_square(void);
 extern int sys_get_ancestors(void);
+extern int sys_set_sleep(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_calculate_biggest_perfect_square]  sys_calculate_biggest_perfect_square,
 [SYS_get_ancestors] sys_get_ancestors,
+[SYS_set_sleep]   sys_set_sleep,
 };
 
 void

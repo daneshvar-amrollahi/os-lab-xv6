@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_calculate_biggest_perfect_square    22
 #define SYS_get_ancestors   23
+#define SYS_set_sleep   24

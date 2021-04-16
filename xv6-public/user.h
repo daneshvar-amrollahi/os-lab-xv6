@@ -25,6 +25,7 @@ int sleep(int);
 int uptime(void);
 int calculate_biggest_perfect_square(void);
 void get_ancestors(void);
+void set_sleep(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

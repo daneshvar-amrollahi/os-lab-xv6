@@ -105,3 +105,11 @@ sys_get_ancestors(void)
   cprintf("Kernel: sys_get_ancesrots() called for pid %d\n", pid);
   get_ancestors(pid);
 }
+
+void 
+sys_set_sleep(void)
+{
+  int n;
+  if (argint(0, &n) >= 0)
+    set_sleep(n);
+}

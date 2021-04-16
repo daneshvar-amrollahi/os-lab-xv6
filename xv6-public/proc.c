@@ -568,3 +568,14 @@ void get_ancestors(int pid)
     //pid = p->parent->pid;
 
 }
+
+void set_sleep(int n)
+{
+  uint ticks0;
+  ticks0 = ticks;
+
+  while(ticks - ticks0 < n * 100)
+      sti();
+
+
+}
