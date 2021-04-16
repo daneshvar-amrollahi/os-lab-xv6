@@ -14,23 +14,15 @@ int main(int argc, char *argv[]){
 		printf(1, "User: calling set_sleep for %d seconds...\n" , number);
 
 
-        struct rtcdate r;
-        set_date(&r);
-
-        //printf(1, "%d", r.second);
+        struct rtcdate st, en;
+        set_date(&st);
+        printf(1, "Current system time: %d\n", st.second);
+        set_sleep(number);      
+        set_date(&en);	
+        printf(1, "Current system time: %d\n", en.second);
         
-        //clock_t start, end;
-        //start = clock();
-        set_sleep(number);  
-    
-        set_date(&r);	
-        //end = clock();
+        printf(1, "Difference: %d\n", en.second - st.second);
 
-        //printf(1, "%d", r.second);
-
-        //double time_taken = (double)(end - start) / (double)(CLOCKS_PER_SEC);    
-        //printf(1, "Time passed is %f", time_taken);
-        //cout << "Time taken for matrix construction is " << fixed << setprecision(6) << time_taken << " sec" << endl;
     }
-
+    exit();
 } 
