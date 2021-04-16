@@ -14,19 +14,19 @@ int main(int argc, char *argv[]){
 		printf(1, "User: calling set_sleep for %d seconds...\n" , number);
 
 
-        struct rtcdate *r;
-        cmostime(r);
+        struct rtcdate r;
+        set_date(&r);
 
-        printf(1, "%d", r->second);
+        //printf(1, "%d", r.second);
         
         //clock_t start, end;
         //start = clock();
         set_sleep(number);  
     
-        cmostime(r);	
+        set_date(&r);	
         //end = clock();
 
-        printf(1, "%d", r->second);
+        //printf(1, "%d", r.second);
 
         //double time_taken = (double)(end - start) / (double)(CLOCKS_PER_SEC);    
         //printf(1, "Time passed is %f", time_taken);

@@ -110,6 +110,18 @@ void
 sys_set_sleep(void)
 {
   int n;
-  if (argint(0, &n) >= 0)
+  if (argint(0, &n) < 0)
+    cprintf("Kernal: sys_set_sleep() has a problem.\n");
+  else
     set_sleep(n);
+}
+
+void 
+sys_set_date(void)
+{
+  struct rtcdate *r;
+  if(argptr(0, (void*)&r, sizeof(*r)) < 0)
+    cprintf("Kernel: sys_set_date() has a problem.\n");
+
+  cmostime(r);
 }

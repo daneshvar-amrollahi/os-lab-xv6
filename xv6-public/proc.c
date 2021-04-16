@@ -577,5 +577,4 @@ void set_sleep(int n)
   while(ticks - ticks0 < n * 100)
       sti();
 
-
 }
