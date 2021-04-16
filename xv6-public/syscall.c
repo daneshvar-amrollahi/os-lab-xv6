@@ -107,6 +107,7 @@ extern int sys_calculate_biggest_perfect_square(void);
 extern int sys_get_ancestors(void);
 extern int sys_set_sleep(void);
 extern int sys_set_date(void);
+extern int sys_get_descendants(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -134,6 +135,7 @@ static int (*syscalls[])(void) = {
 [SYS_get_ancestors] sys_get_ancestors,
 [SYS_set_sleep]   sys_set_sleep,
 [SYS_set_date]    sys_set_date,
+[SYS_get_descendants]   sys_get_descendants,
 };
 
 void

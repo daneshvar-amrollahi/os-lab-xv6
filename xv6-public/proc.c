@@ -569,6 +569,26 @@ void get_ancestors(int pid)
 
 }
 
+void get_descendants(int pid)
+{
+  struct proc *p;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+    if (p->parent->pid == pid)
+    {
+      cprintf("my id: %d, ", p->pid);
+      cprintf("my parent id: %d\n ", pid);
+
+      release(&ptable.lock);
+      get_descendants(p->pid);
+      acquire(&ptable.lock);
+    }
+  }
+  release(&ptable.lock);
+}
+
+
 void set_sleep(int n)
 {
   uint ticks0;

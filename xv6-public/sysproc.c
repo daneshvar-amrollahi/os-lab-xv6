@@ -125,3 +125,11 @@ sys_set_date(void)
 
   cmostime(r);
 }
+
+void 
+sys_get_descendants(void)
+{
+  int pid = myproc()->tf->ebx; 
+  cprintf("Kernel: sys_get_descendants() called for pid %d\n", pid);
+  get_descendants(pid);
+}

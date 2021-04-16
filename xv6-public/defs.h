@@ -124,6 +124,7 @@ int             calculate_biggest_perfect_square(int);
 void            get_ancestors(int);
 void            set_sleep(int);
 void			set_date(struct rtcdate *);
+void            get_descendants(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

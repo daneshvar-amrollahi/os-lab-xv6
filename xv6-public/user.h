@@ -27,6 +27,7 @@ int calculate_biggest_perfect_square(void);
 void get_ancestors(void);
 void set_sleep(int);
 void set_date(struct rtcdate *);
+void get_descendants(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
