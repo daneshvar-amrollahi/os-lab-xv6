@@ -186,6 +186,7 @@ UPROGS=\
 	_get_ancestors\
 	_proc_sleep\
 	_get_descendants\
+	_process_start_time\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -255,7 +256,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
-	strdiff.c printf.c umalloc.c _biggest_perfect_square.c _get_ancestors.c _proc_sleep.c _get_descendants\
+	strdiff.c printf.c umalloc.c _biggest_perfect_square.c _get_ancestors.c _proc_sleep.c _get_descendants.c _process_start_time.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 

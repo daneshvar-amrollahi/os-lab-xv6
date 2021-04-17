@@ -183,6 +183,7 @@ fork(void)
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
+  curproc->creation_time = ticks;
 
   // Allocate process.
   if((np = allocproc()) == 0){
@@ -217,7 +218,6 @@ fork(void)
   np->state = RUNNABLE;
 
   release(&ptable.lock);
-
   return pid;
 }
 

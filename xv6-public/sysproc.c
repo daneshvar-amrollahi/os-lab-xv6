@@ -133,3 +133,10 @@ sys_get_descendants(void)
   cprintf("Kernel: sys_get_descendants() called for pid %d\n", pid);
   get_descendants(pid);
 }
+
+int
+sys_process_start_time(void)
+{
+  struct proc *curproc = myproc();
+  return (int)(curproc->creation_time); 
+}
