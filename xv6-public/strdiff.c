@@ -45,6 +45,7 @@ main(int argc, char *argv[])
   ans[j] = '\n';
   ans[j + 1] = '\0';
 
+  unlink("strdiff_result.txt");
   int fd = open("strdiff_result.txt", O_CREATE | O_RDWR);
   write(fd, ans, strlen(ans));
 
