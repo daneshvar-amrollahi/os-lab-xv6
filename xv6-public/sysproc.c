@@ -146,3 +146,11 @@ sys_print_all_proc(void)
 {
   print_all_proc();
 }
+void
+sys_set_queue(void)
+{
+  int pid, queue;
+  argint(0, &pid);
+  argint(1, &queue);
+  set_queue(pid, queue);
+}

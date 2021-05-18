@@ -629,6 +629,18 @@ get_state_string(int state)
   }
 }
 
+char*
+get_queue_string(int queue)
+{
+  if (queue == 1)
+    return "RR";
+  else if (queue == 2)
+    return "PRIORITY";
+  else if (queue == 3)
+    return "BJF";
+  else
+    return "FCFS";
+}
 
 int
 get_int_len(int num)
@@ -660,6 +672,10 @@ print_all_proc()
   for (int i = 0 ; i < 5 ; i++)
     cprintf(" ");
 
+  cprintf("queue");
+  for (int i = 0 ; i < 5; i++)
+    cprintf(" ");
+
   cprintf("\n");
   for (int i = 0 ; i < 30 ; i++)
     cprintf("-");
@@ -685,8 +701,26 @@ print_all_proc()
     for (int i = 0 ; i < 10 - strlen(get_state_string(p->state)) ; i++)
       cprintf(" "); 
 
+    cprintf(get_queue_string(p->queue));
+    for (int i = 0 ; i < 10 - strlen(get_queue_string(p->queue)); i++)
+      cprintf(" ");
+
     cprintf("\n");
   }
   release(&ptable.lock);
   
+}
+
+void
+set_queue(int pid, int queue)
+{
+  struct proc *p;
+
+  acquire(&ptable.lock);
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->pid == pid)
+      p->queue = queue;
+  }
+  release(&ptable.lock);
 }

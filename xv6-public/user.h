@@ -30,6 +30,7 @@ void set_date(struct rtcdate *);
 void get_descendants(void);
 int process_start_time(void);
 void print_all_proc(void);
+void set_queue(int, int);
 
 // ulib.c
 int stat(const char*, struct stat*);
