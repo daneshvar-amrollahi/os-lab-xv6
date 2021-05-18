@@ -126,6 +126,7 @@ void            set_sleep(int);
 void			set_date(struct rtcdate *);
 void            get_descendants(int);
 int             process_start_time(void);
+void            print_all_proc(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

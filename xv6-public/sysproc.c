@@ -140,3 +140,9 @@ sys_process_start_time(void)
   struct proc *curproc = myproc();
   return (int)(curproc->creation_time); 
 }
+
+void
+sys_print_all_proc(void)
+{
+  print_all_proc();
+}

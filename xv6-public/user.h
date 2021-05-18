@@ -29,6 +29,7 @@ void set_sleep(int);
 void set_date(struct rtcdate *);
 void get_descendants(void);
 int process_start_time(void);
+void print_all_proc(void);
 
 // ulib.c
 int stat(const char*, struct stat*);

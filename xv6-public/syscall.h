@@ -26,3 +26,4 @@
 #define SYS_set_date 	25
 #define SYS_get_descendants 26
 #define SYS_process_start_time  27
+#define SYS_print_all_proc  28

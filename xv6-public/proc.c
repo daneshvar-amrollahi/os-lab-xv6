@@ -543,7 +543,8 @@ int calculate_biggest_perfect_square(int n)
     return ans * ans;
 }
 
-void get_ancestors(int pid)
+void 
+get_ancestors(int pid)
 { 
     struct proc *p;
 
@@ -569,7 +570,8 @@ void get_ancestors(int pid)
 
 }
 
-void get_descendants(int pid)
+void 
+get_descendants(int pid)
 {
   struct proc *p;
 
@@ -589,7 +591,8 @@ void get_descendants(int pid)
 }
 
 
-void set_sleep(int n)
+void 
+set_sleep(int n)
 {
   uint ticks0;
   ticks0 = ticks;
@@ -597,4 +600,93 @@ void set_sleep(int n)
   while(ticks - ticks0 < n * 100)
       sti();
 
+}
+
+
+char*
+get_state_string(int state)
+{
+  if (state == 0) {
+    return "UNUSED";
+  }
+  else if (state == 1) {
+    return "EMBRYO";
+  }
+  else if (state == 2) {
+    return "SLEEPING";
+  }
+  else if (state == 3) {
+    return "RUNNABLE";
+  }
+  else if (state == 4) {
+    return "RUNNING";
+  }
+  else if (state == 5) {
+    return "ZOMBIE";
+  }
+  else {
+    return "";
+  }
+}
+
+
+int
+get_int_len(int num)
+{
+  int len = 0;
+  if (num == 0)
+    return 1;
+  while (num > 0) {
+    len++;
+    num = num / 10;
+  }
+  return len;
+}
+
+void 
+print_all_proc()
+{
+  struct proc *p;
+
+  cprintf("name");
+  for (int i = 0 ; i < 6 ; i++)
+    cprintf(" ");
+  
+  cprintf("pid");
+  for (int i = 0 ; i < 7 ; i++)
+    cprintf(" ");
+
+  cprintf("state");
+  for (int i = 0 ; i < 5 ; i++)
+    cprintf(" ");
+
+  cprintf("\n");
+  for (int i = 0 ; i < 30 ; i++)
+    cprintf("-");
+  cprintf("\n");
+
+
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+    if (p->state == UNUSED)
+      continue;
+
+
+    cprintf(p->name);
+    for (int i = 0 ; i < 10 - strlen(p->name) ; i++)
+      cprintf(" ");
+
+    cprintf("%d", p->pid);
+    for (int i = 0 ; i < 10 - get_int_len(p->pid) ; i++)
+      cprintf(" ");
+
+    cprintf(get_state_string(p->state));
+    for (int i = 0 ; i < 10 - strlen(get_state_string(p->state)) ; i++)
+      cprintf(" "); 
+
+    cprintf("\n");
+  }
+  release(&ptable.lock);
+  
 }
