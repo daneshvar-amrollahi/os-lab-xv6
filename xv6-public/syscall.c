@@ -111,6 +111,7 @@ extern int sys_get_descendants(void);
 extern int sys_process_start_time(void);
 extern int sys_print_all_proc(void);
 extern int sys_set_queue(void);
+extern int sys_set_priority(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -142,6 +143,7 @@ static int (*syscalls[])(void) = {
 [SYS_process_start_time]  sys_process_start_time,
 [SYS_print_all_proc]  sys_print_all_proc,
 [SYS_set_queue] sys_set_queue,
+[SYS_set_priority] sys_set_priority,
 };
 
 void

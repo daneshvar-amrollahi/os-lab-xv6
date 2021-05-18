@@ -128,6 +128,8 @@ void            get_descendants(int);
 int             process_start_time(void);
 void            print_all_proc(void);
 void            set_queue(int, int);
+void			set_priority(int, int);
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 

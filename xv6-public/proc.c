@@ -89,6 +89,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->queue = 1; //default: RR
+  p->priority = -1; //defult: -1
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -676,8 +677,12 @@ print_all_proc()
   for (int i = 0 ; i < 5; i++)
     cprintf(" ");
 
+  cprintf("priority");
+  for (int i = 0; i < 2; i++)
+    cprintf(" ");
+
   cprintf("\n");
-  for (int i = 0 ; i < 40 ; i++)
+  for (int i = 0 ; i < 50 ; i++)
     cprintf("-");
   cprintf("\n");
 
@@ -705,6 +710,10 @@ print_all_proc()
     for (int i = 0 ; i < 10 - strlen(get_queue_string(p->queue)); i++)
       cprintf(" ");
 
+    cprintf("%d", p->priority);
+    for (int i = 0; i < 10 - get_int_len(p->priority); i++)
+      cprintf(" ");
+
     cprintf("\n");
   }
   release(&ptable.lock);
@@ -723,4 +732,17 @@ set_queue(int pid, int queue)
       p->queue = queue;
   }
   release(&ptable.lock);
+}
+
+void
+set_priority(int pid, int priority){
+  struct proc *p;
+
+  acquire(&ptable.lock);
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->pid == pid)
+      p->priority = priority;
+  }
+  release(&ptable.lock); 
 }

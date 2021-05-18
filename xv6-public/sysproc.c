@@ -146,6 +146,7 @@ sys_print_all_proc(void)
 {
   print_all_proc();
 }
+
 void
 sys_set_queue(void)
 {
@@ -153,4 +154,13 @@ sys_set_queue(void)
   argint(0, &pid);
   argint(1, &queue);
   set_queue(pid, queue);
+}
+
+void
+sys_set_priority(void)
+{
+  int pid, priority;
+  argint(0, &pid);
+  argint(1, &priority);
+  set_priority(pid, priority);
 }
