@@ -88,7 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-
+  p->queue = 1; //default: RR
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -677,7 +677,7 @@ print_all_proc()
     cprintf(" ");
 
   cprintf("\n");
-  for (int i = 0 ; i < 30 ; i++)
+  for (int i = 0 ; i < 40 ; i++)
     cprintf("-");
   cprintf("\n");
 
