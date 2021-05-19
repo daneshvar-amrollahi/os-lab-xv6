@@ -70,6 +70,19 @@ myproc(void) {
 // If found, change state to EMBRYO and initialize
 // state required to run in the kernel.
 // Otherwise return 0.
+
+
+int
+rand_int(int low, int high)
+{
+  int rand;
+  acquire(&tickslock);
+  rand = (ticks * ticks * ticks * 71413) % (high - low + 1) + low;
+  release(&tickslock);
+  return rand;
+}
+
+
 static struct proc*
 allocproc(void)
 {
@@ -89,7 +102,17 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->queue = 1; //default: RR
-  p->priority = -1; //defult: -1
+  
+  p->priority = rand_int(1, 1000);
+  p->priority_ratio = 1;
+  p->arrival_time_ratio = 1;
+  p->executed_cycle_ratio = 1;
+  p->creation_time = ticks;
+
+  acquire(&tickslock);
+  p->creation_time = ticks;
+  release(&tickslock);
+
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -184,7 +207,7 @@ fork(void)
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
-  curproc->creation_time = ticks;
+  //curproc->creation_time = ticks;
 
   // Allocate process.
   if((np = allocproc()) == 0){
@@ -662,27 +685,44 @@ print_all_proc()
   struct proc *p;
 
   cprintf("name");
-  for (int i = 0 ; i < 6 ; i++)
+  for (int i = 0 ; i < 5 - 4 ; i++)
     cprintf(" ");
   
   cprintf("pid");
-  for (int i = 0 ; i < 7 ; i++)
+  for (int i = 0 ; i < 5 - 3 ; i++)
     cprintf(" ");
 
   cprintf("state");
-  for (int i = 0 ; i < 5 ; i++)
+  for (int i = 0 ; i < 10 - 5 ; i++)
     cprintf(" ");
 
   cprintf("queue");
-  for (int i = 0 ; i < 5; i++)
+  for (int i = 0 ; i < 10 - 5 ; i++)
     cprintf(" ");
 
   cprintf("priority");
-  for (int i = 0; i < 2; i++)
+  for (int i = 0; i < 10 - 8 ; i++)
+    cprintf(" ");
+
+  
+  cprintf("p_ratio");
+  for (int i = 0 ; i < 10 - 7 ; i++)
+    cprintf(" ");
+
+  cprintf("at_ratio");
+  for (int i = 0 ; i < 10 - 8 ; i++)
+    cprintf(" ");
+
+  cprintf("ec_ratio");
+  for (int i = 0 ; i < 10 - 8 ; i++)
+    cprintf(" ");
+
+  cprintf("arr_time");
+  for (int i = 0 ; i < 10 - 8 ; i++)
     cprintf(" ");
 
   cprintf("\n");
-  for (int i = 0 ; i < 50 ; i++)
+  for (int i = 0 ; i < 80 ; i++)
     cprintf("-");
   cprintf("\n");
 
@@ -695,11 +735,11 @@ print_all_proc()
 
 
     cprintf(p->name);
-    for (int i = 0 ; i < 10 - strlen(p->name) ; i++)
+    for (int i = 0 ; i < 5 - strlen(p->name) ; i++)
       cprintf(" ");
 
     cprintf("%d", p->pid);
-    for (int i = 0 ; i < 10 - get_int_len(p->pid) ; i++)
+    for (int i = 0 ; i < 5 - get_int_len(p->pid) ; i++)
       cprintf(" ");
 
     cprintf(get_state_string(p->state));
@@ -712,6 +752,23 @@ print_all_proc()
 
     cprintf("%d", p->priority);
     for (int i = 0; i < 10 - get_int_len(p->priority); i++)
+      cprintf(" ");
+
+
+    cprintf("%d", p->priority_ratio);
+    for (int i = 0 ; i < 10 - get_int_len(p->priority_ratio) ; i++)
+      cprintf(" ");
+
+    cprintf("%d", p->arrival_time_ratio);
+    for (int i = 0 ; i < 10 - get_int_len(p->arrival_time_ratio) ; i++)
+      cprintf(" ");
+
+    cprintf("%d", p->executed_cycle_ratio);
+    for (int i = 0 ; i < 10 - get_int_len(p->executed_cycle_ratio) ; i++)
+      cprintf(" ");
+
+    cprintf("%d", p->creation_time);
+    for (int i = 0 ; i < 10 - get_int_len(p->creation_time) ; i++)
       cprintf(" ");
 
     cprintf("\n");
@@ -743,6 +800,24 @@ set_priority(int pid, int priority){
   {
     if (p->pid == pid)
       p->priority = priority;
+  }
+  release(&ptable.lock); 
+}
+
+void
+set_bjf_params(int pid, int priority_ratio, int arrival_time_ratio, int executed_cycle_ratio)
+{
+  struct proc *p;
+
+  acquire(&ptable.lock);
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->pid == pid)
+    {
+      p->priority_ratio = priority_ratio;
+      p->arrival_time_ratio = arrival_time_ratio;
+      p->executed_cycle_ratio = executed_cycle_ratio; 
+    }
   }
   release(&ptable.lock); 
 }

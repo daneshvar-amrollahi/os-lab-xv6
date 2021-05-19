@@ -129,6 +129,7 @@ int             process_start_time(void);
 void            print_all_proc(void);
 void            set_queue(int, int);
 void			set_priority(int, int);
+void            set_bjf_params(int, int, int, int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

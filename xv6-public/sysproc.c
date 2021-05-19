@@ -164,3 +164,13 @@ sys_set_priority(void)
   argint(1, &priority);
   set_priority(pid, priority);
 }
+
+void sys_set_bjf_params(void)
+{
+  int pid, priority_ratio, arrival_time_ratio, executed_cycle_ratio;
+  argint(0, &pid);
+  argint(1, &priority_ratio);
+  argint(2, &arrival_time_ratio);
+  argint(3, &executed_cycle_ratio);
+  set_bjf_params(pid, priority_ratio, arrival_time_ratio, executed_cycle_ratio);
+}

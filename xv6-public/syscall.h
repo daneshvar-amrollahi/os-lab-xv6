@@ -29,3 +29,4 @@
 #define SYS_print_all_proc  28
 #define SYS_set_queue 29
 #define SYS_set_priority 30
+#define SYS_set_bjf_params  31

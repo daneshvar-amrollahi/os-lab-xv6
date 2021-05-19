@@ -112,6 +112,7 @@ extern int sys_process_start_time(void);
 extern int sys_print_all_proc(void);
 extern int sys_set_queue(void);
 extern int sys_set_priority(void);
+extern int sys_set_bjf_params(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -144,6 +145,7 @@ static int (*syscalls[])(void) = {
 [SYS_print_all_proc]  sys_print_all_proc,
 [SYS_set_queue] sys_set_queue,
 [SYS_set_priority] sys_set_priority,
+[SYS_set_bjf_params] sys_set_bjf_params,
 };
 
 void

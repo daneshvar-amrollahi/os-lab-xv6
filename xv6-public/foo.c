@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     int pid[10];
-    for (int i = 0 ; i < 10 ; i++)
+    for (int i = 0 ; i < 5 ; i++)
     {
         pid[i] = fork();
         if (pid[i] == 0)
