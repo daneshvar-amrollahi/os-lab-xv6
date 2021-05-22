@@ -102,7 +102,9 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->queue = 1; //default: RR
-  
+  p->exec_cycle = 0;
+  p->last_cpu_time = 0;
+
   p->priority = rand_int(1, 1000);
   p->priority_ratio = 1;
   p->arrival_time_ratio = 1;
@@ -343,10 +345,60 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
+float
+get_rank(struct proc* p)
+{
+  return 
+    p->priority * p->priority_ratio
+    + p->creation_time * p->arrival_time_ratio
+    + p->exec_cycle * p->executed_cycle_ratio;
+}
+
+struct proc*
+bjf_finder(void)
+{
+  struct proc* p;
+  struct proc* min_proc = 0;
+  float min_rank = 1000000;
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+    if (p->state != RUNNABLE || p->queue != 3)
+      continue;
+    if (get_rank(p) < min_rank){
+      min_proc = p;
+      min_rank = get_rank(p);
+    }
+  }
+
+  return min_proc;
+}
+
+struct proc*
+round_robin_finder(void)
+{
+  struct proc *p;
+  struct proc *best = 0;
+
+  int now = ticks;
+  int max_proc = -100000;
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE || p->queue != 1)
+        continue;
+
+      if(now - p->last_cpu_time > max_proc){
+        max_proc = now - p->last_cpu_time;
+        best = p;
+      }
+  }
+  return best;
+}
+
 void
 scheduler(void)
 {
-  struct proc *p;
+  struct proc *p = 0;
   struct cpu *c = mycpu();
   c->proc = 0;
   
@@ -356,24 +408,55 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+    // struct proc *min_rank;
+    // int found = -1;
+    // for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    //   if(p->queue != 3 || p->state != RUNNABLE)
+    //     continue;
+    //   if(found == -1){
+    //     min_rank = p;
+    //     found = 1;
+    //   }
+    //   else if(get_rank(p) < get_rank(min_rank))
+    //     min_rank = p;
+    // }
 
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+    p = round_robin_finder();
+    if(p == 0)
+      p = bjf_finder();
+    
+    if (p == 0) {
+      release(&ptable.lock);
+      continue;
     }
+    c->proc = p;
+    switchuvm(p);
+    p->state = RUNNING;
+
+    swtch(&(c->scheduler), p->context);
+    switchkvm();
+
+    c->proc = 0;
+
+    // for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    //   if(p->state != RUNNABLE)
+    //     continue;
+
+    //   // Switch to chosen process.  It is the process's job
+    //   // to release ptable.lock and then reacquire it
+    //   // before jumping back to us.
+    //   c->proc = p;
+    //   switchuvm(p);
+    //   p->state = RUNNING;
+
+    //   swtch(&(c->scheduler), p->context);
+    //   switchkvm();
+
+    //   // Process is done running for now.
+    //   // It should have changed its p->state before coming back.
+    //   c->proc = 0;
+    // }
     release(&ptable.lock);
 
   }
@@ -411,6 +494,8 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
+  myproc()->last_cpu_time = ticks;
+  myproc()->exec_cycle += 0.1;
   sched();
   release(&ptable.lock);
 }
@@ -659,7 +744,7 @@ get_queue_string(int queue)
   if (queue == 1)
     return "RR";
   else if (queue == 2)
-    return "PRIORITY";
+    return "PRIR";
   else if (queue == 3)
     return "BJF";
   else
@@ -677,6 +762,12 @@ get_int_len(int num)
     num = num / 10;
   }
   return len;
+}
+
+int round(float num){
+  if(num - (int)(num) <= 0.5)
+    return (int)(num);
+  return (int)(num) + 1;
 }
 
 void 
@@ -697,7 +788,7 @@ print_all_proc()
     cprintf(" ");
 
   cprintf("queue");
-  for (int i = 0 ; i < 10 - 5 ; i++)
+  for (int i = 0 ; i < 6 - 5 ; i++)
     cprintf(" ");
 
   cprintf("priority");
@@ -721,8 +812,13 @@ print_all_proc()
   for (int i = 0 ; i < 10 - 8 ; i++)
     cprintf(" ");
 
+  cprintf("exec_c*10");
+  for (int i = 0; i < 10 - 10 ; i++)
+    cprintf(" ");
+
+
   cprintf("\n");
-  for (int i = 0 ; i < 80 ; i++)
+  for (int i = 0 ; i < 86 ; i++)
     cprintf("-");
   cprintf("\n");
 
@@ -747,7 +843,7 @@ print_all_proc()
       cprintf(" "); 
 
     cprintf(get_queue_string(p->queue));
-    for (int i = 0 ; i < 10 - strlen(get_queue_string(p->queue)); i++)
+    for (int i = 0 ; i < 6 - strlen(get_queue_string(p->queue)); i++)
       cprintf(" ");
 
     cprintf("%d", p->priority);
@@ -770,6 +866,8 @@ print_all_proc()
     cprintf("%d", p->creation_time);
     for (int i = 0 ; i < 10 - get_int_len(p->creation_time) ; i++)
       cprintf(" ");
+
+    cprintf("%d", round(p->exec_cycle * 10));
 
     cprintf("\n");
   }

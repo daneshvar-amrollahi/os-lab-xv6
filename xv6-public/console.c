@@ -53,6 +53,19 @@ printint(int xx, int base, int sign)
 }
 //PAGEBREAK: 50
 
+void
+printfloat(float xx)
+{
+  int beg=(int)(xx);
+  int fin=(int)(xx*100)-beg*100;
+  printint(beg, 10, 1);
+  consputc('.');
+  if(fin<10)
+    consputc('0');
+  printint(fin, 10, 1);
+}
+
+
 // Print to the console. only understands %d, %x, %p, %s.
 void
 cprintf(char *fmt, ...)
@@ -78,6 +91,9 @@ cprintf(char *fmt, ...)
     if(c == 0)
       break;
     switch(c){
+    case 'f':
+      printfloat(*argp++);
+      break;
     case 'd':
       printint(*argp++, 10, 1);
       break;
