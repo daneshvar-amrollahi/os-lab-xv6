@@ -395,6 +395,56 @@ round_robin_finder(void)
   return best;
 }
 
+struct proc*
+min_priority_finder(void)
+{
+  struct proc *p;
+  struct proc *min_proc = 0;
+
+  int mn = 2e9;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if (p->state != RUNNABLE || p->queue != 2)
+        continue;
+
+      if (p->priority < mn)
+      {
+        mn = p->priority;
+        min_proc = p;
+      }
+  }
+
+  return min_proc;
+}
+
+struct proc*
+fcfs_finder(void)
+{
+  struct proc *p;
+  struct proc *first_proc = 0;
+
+  int mn = 2e9;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if (p->state != RUNNABLE || p->queue != 4)
+        continue;
+
+      if (p->creation_time < mn)
+      {
+        mn = p->creation_time;
+        first_proc = p;
+      }
+  }
+  return first_proc;
+}
+
+//queue: C B A                                                              1
+//queue: C B    -    A waiting                                              2
+//queue: B C    -    A waiting                                              3
+//queue: A B C  -                                                           4
+//queue: A B         last_cpu_time(A): 1   ,    last_cpu_time(B): 3         5
+//
+
+//5 - 1 > 5 - 3 ---> A is chosen
+
 void
 scheduler(void)
 {
@@ -423,9 +473,16 @@ scheduler(void)
     // }
 
     p = round_robin_finder();
+
+    if (p == 0)
+      p = min_priority_finder();
+
     if(p == 0)
       p = bjf_finder();
     
+    if (p == 0)
+      p = fcfs_finder();
+
     if (p == 0) {
       release(&ptable.lock);
       continue;

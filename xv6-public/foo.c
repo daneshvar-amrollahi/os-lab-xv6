@@ -11,7 +11,11 @@ int main(int argc, char *argv[])
         pid[i] = fork();
         if (pid[i] == 0)
         {
-            for (int j = 0 ; j < 5000000000 ; j++);
+            for (long int j = 0 ; j < 2250000000 ; j++)
+            {
+                int x = 2;
+                x++;
+            }
             exit();
         }
     }
