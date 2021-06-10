@@ -976,3 +976,19 @@ set_bjf_params(int pid, int priority_ratio, int arrival_time_ratio, int executed
   }
   release(&ptable.lock); 
 }
+
+void
+multiple_acquire(int cnt)
+{
+  if (cnt == 0)
+  {
+    release(&tickslock);
+    return;
+  }
+
+  cprintf("Acquiring... cnt = %d\n", cnt);
+  acquire(&tickslock);
+  multiple_acquire(cnt - 1);
+
+  
+}

@@ -174,3 +174,11 @@ void sys_set_bjf_params(void)
   argint(3, &executed_cycle_ratio);
   set_bjf_params(pid, priority_ratio, arrival_time_ratio, executed_cycle_ratio);
 }
+
+void
+sys_multiple_acquire(void)
+{
+  int cnt;
+  argint(0, &cnt);
+  multiple_acquire(cnt);
+}

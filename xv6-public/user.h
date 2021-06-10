@@ -33,6 +33,7 @@ void print_all_proc(void);
 void set_queue(int, int);
 void set_priority(int, int);
 void set_bjf_params(int, int, int, int);
+void multiple_acquire(int);
 
 // ulib.c
 int stat(const char*, struct stat*);
