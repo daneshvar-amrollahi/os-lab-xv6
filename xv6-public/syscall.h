@@ -31,3 +31,4 @@
 #define SYS_set_priority 30
 #define SYS_set_bjf_params  31
 #define SYS_multiple_acquire    32
+#define SYS_rwtest 33

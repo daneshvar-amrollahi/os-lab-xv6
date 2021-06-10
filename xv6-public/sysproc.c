@@ -182,3 +182,11 @@ sys_multiple_acquire(void)
   argint(0, &cnt);
   multiple_acquire(cnt);
 }
+
+void
+sys_rwtest(void)
+{
+  int pattern;
+  argint(0, &pattern);
+  rwtest(pattern);
+}

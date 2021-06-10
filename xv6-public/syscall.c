@@ -114,6 +114,7 @@ extern int sys_set_queue(void);
 extern int sys_set_priority(void);
 extern int sys_set_bjf_params(void);
 extern int sys_multiple_acquire(void);
+extern int sys_rwtest(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -148,6 +149,7 @@ static int (*syscalls[])(void) = {
 [SYS_set_priority] sys_set_priority,
 [SYS_set_bjf_params] sys_set_bjf_params,
 [SYS_multiple_acquire] sys_multiple_acquire,
+[SYS_rwtest] sys_rwtest,
 };
 
 void

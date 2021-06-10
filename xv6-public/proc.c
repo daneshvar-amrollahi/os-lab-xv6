@@ -7,6 +7,9 @@
 #include "proc.h"
 #include "spinlock.h"
 
+#define READER 0
+#define WRITER 1
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -988,7 +991,32 @@ multiple_acquire(int cnt)
 
   cprintf("Acquiring... cnt = %d\n", cnt);
   acquire(&tickslock);
-  multiple_acquire(cnt - 1);
+  multiple_acquire(cnt - 1); 
+}
 
+void
+rwtest(int pattern)
+{
+  int digit_count = 0;
+  int pattern_copy = pattern;
+  while(pattern_copy)
+  {
+    pattern_copy /= 2;
+    digit_count++;
+  }
+
+  int reader_writers[digit_count];
+  for (int i = 0; i < digit_count; i++)
+  {
+    reader_writers[i] = ((1 << i) & (pattern)) ? 1 : 0;
+  }
   
+  for (int i = 0; i < digit_count - 1; i++)
+  {
+    if (fork() == 0) {
+      // rw_exec(reader_writers[i]);
+      exit();
+    }
+  }
+  while(wait() > -1);
 }
