@@ -189,6 +189,7 @@ UPROGS=\
 	_set_priority\
 	_set_bjf\
 	_multiple_acquire\
+	_rwtest\
 	
 #_biggest_perfect_square\
 #_get_ancestors\
@@ -269,6 +270,7 @@ EXTRA=\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 	_multiple_acquire.c\
+	_rwtest.c\
 #_biggest_perfect_square.c _get_ancestors.c _proc_sleep.c _get_descendants.c _process_start_time.c\
 	
 	

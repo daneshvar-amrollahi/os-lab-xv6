@@ -32,3 +32,4 @@
 #define SYS_set_bjf_params  31
 #define SYS_multiple_acquire    32
 #define SYS_rwtest 33
+#define SYS_rw_exec 34

@@ -132,6 +132,7 @@ void			set_priority(int, int);
 void            set_bjf_params(int, int, int, int);
 void            multiple_acquire(int);
 void            rwtest(int);
+void			rw_exec(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -5,7 +5,8 @@
 #include "mmu.h"
 #include "x86.h"
 #include "proc.h"
-#include "spinlock.h"
+//#include "spinlock.h"
+#include "bed.h"
 
 #define READER 0
 #define WRITER 1
@@ -994,6 +995,59 @@ multiple_acquire(int cnt)
   multiple_acquire(cnt - 1); 
 }
 
+struct bed r_bed = {.lock.locked = 0};
+struct spinlock lk = {.locked = 0};
+int w = 0;
+int readers_count = 0;
+int writers_count = 0;
+int is_writing = 0;
+int is_reading = 0;
+
+void 
+rw_exec(int who)
+{
+  cprintf("who is danesh?: %d", who);
+  int i = 0;
+  while (i++ < 1) {
+
+    if (who == READER) {
+      acquire(&lk);
+      readers_count++;
+      while (is_writing)
+        sleep(&r_bed, &lk);
+      is_reading++;
+      release(&lk);
+
+      cprintf("Reader PID %d: read %d\n", myproc()->pid, w);
+
+      acquire(&lk);
+      is_reading--;
+      readers_count--;
+      wakeup(&r_bed);
+      release(&lk);
+    }
+
+
+    else if (who == WRITER) {
+      acquire(&lk);
+      if (readers_count > 0)
+        sleep(&r_bed, &lk);
+      while (is_reading || is_writing)
+        sleep(&r_bed, &lk);
+      is_writing++;
+      release(&lk);
+
+      w++;
+      cprintf("Writer PID %d: wrote %d\n", myproc()->pid, w);
+
+      acquire(&lk);
+      is_writing--;
+      wakeup(&r_bed);
+      release(&lk);
+    }
+  }
+}
+
 void
 rwtest(int pattern)
 {
@@ -1010,11 +1064,20 @@ rwtest(int pattern)
   {
     reader_writers[i] = ((1 << i) & (pattern)) ? 1 : 0;
   }
-  
+
+  for(int i = digit_count - 1; i >= 0; i--)
+    cprintf("%d", reader_writers[i]);
+
+  // rw_exec(reader_writers[0]);
+
   for (int i = 0; i < digit_count - 1; i++)
   {
-    if (fork() == 0) {
-      // rw_exec(reader_writers[i]);
+    int pid = fork();
+    cprintf("fork output = %d.\n", pid);
+    if (pid == 0) {
+      reader_writers[i]++;
+      cprintf("DAnesh is here.\n");
+      rw_exec(reader_writers[i]);
       exit();
     }
   }

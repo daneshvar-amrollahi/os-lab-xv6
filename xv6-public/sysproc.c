@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "bed.h"
 
 int
 sys_fork(void)
@@ -181,6 +182,14 @@ sys_multiple_acquire(void)
   int cnt;
   argint(0, &cnt);
   multiple_acquire(cnt);
+}
+
+void
+sys_rw_exec(void)
+{
+  int who;
+  argint(0, &who);
+  rw_exec(who);
 }
 
 void
