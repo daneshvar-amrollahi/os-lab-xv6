@@ -116,6 +116,7 @@ extern int sys_set_bjf_params(void);
 extern int sys_multiple_acquire(void);
 extern int sys_rwtest(void);
 extern int sys_rw_exec(void);
+extern int sys_wr_exec(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -152,6 +153,7 @@ static int (*syscalls[])(void) = {
 [SYS_multiple_acquire] sys_multiple_acquire,
 [SYS_rwtest] sys_rwtest,
 [SYS_rw_exec] sys_rw_exec,
+[SYS_wr_exec] sys_wr_exec,
 };
 
 void

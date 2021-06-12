@@ -36,6 +36,7 @@ void set_bjf_params(int, int, int, int);
 void multiple_acquire(int);
 void rwtest(int);
 void rw_exec(int);
+void wr_exec(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

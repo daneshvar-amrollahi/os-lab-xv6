@@ -187,13 +187,21 @@ sys_multiple_acquire(void)
 void
 sys_rw_exec(void)
 {
-  int who;
-  argint(0, &who);
-  rw_exec(who);
+  int type;
+  argint(0, &type);
+  rw_exec(type);
 }
 
 void
-sys_rwtest(void)
+sys_wr_exec(void)
+{
+  int type;
+  argint(0, &type);
+  wr_exec(type);
+}
+
+void
+sys_rwtest(void) //not working now
 {
   int pattern;
   argint(0, &pattern);

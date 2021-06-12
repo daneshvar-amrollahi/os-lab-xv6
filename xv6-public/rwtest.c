@@ -6,33 +6,46 @@
 #define WRITER 1
 
 int main(int argc, char *argv[]){
-	// if(argc < 2){
-	// 	printf(2, "You must enter exactly 1 number!\n");
-	// 	exit();
-	// }
+	int pattern = atoi(argv[1]);
+  int priority = atoi(argv[2]);
 
-	// int pattern = atoi(argv[1]);
+	//rwtest(pattern);
 
-	// rwtest(pattern);
+  
+  int digit_count = 0;
+  int pattern_copy = pattern;
+  while(pattern_copy)
+  {
+    pattern_copy /= 2;
+    digit_count++;
+  }
 
-	if (fork() == 0) {
-      for (int i = 0; i < 5; i++) {
-        if (fork() == 0) {
-          rw_exec(WRITER);
-          exit();
-        }
-      }
+  int reader_writers[digit_count];
+  for (int i = 0; i < digit_count; i++)
+  {
+    reader_writers[i] = ((1 << i) & (pattern)) ? 1 : 0;
+  }
+
+  for(int i = digit_count - 1; i >= 0; i--)
+    printf(1, "%d", reader_writers[i]);
+
+  printf(1, "\n");
+
+  for (int i = digit_count - 2; i >= 0 ; i--)
+  {
+    int pid = fork();
+    if (pid == 0) {
+      if (priority == READER)
+        rw_exec(reader_writers[i]);
+      else if (priority == WRITER)
+        wr_exec(reader_writers[i]);
+
+      exit();
     }
-    else if (fork() == 0) {
-      for (int i = 0; i < 5; i++) {
-        if (fork() == 0) {
-          rw_exec(READER);
-          exit();
-        }
-      }
-    }
+  }
 
-	while(wait() > -1);
+  while(wait() != -1);
+  
 
-    exit();
+  return 0;
 } 

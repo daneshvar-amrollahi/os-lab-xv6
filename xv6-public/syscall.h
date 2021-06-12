@@ -33,3 +33,4 @@
 #define SYS_multiple_acquire    32
 #define SYS_rwtest 33
 #define SYS_rw_exec 34
+#define SYS_wr_exec 35

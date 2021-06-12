@@ -997,7 +997,6 @@ multiple_acquire(int cnt)
 
 struct bed r_bed = {.lock.locked = 0};
 struct spinlock lk = {.locked = 0};
-int w = 0;
 int readers_count = 0;
 int writers_count = 0;
 int is_writing = 0;
@@ -1006,23 +1005,28 @@ int is_reading = 0;
 void 
 rw_exec(int who)
 {
-  cprintf("who is danesh?: %d", who);
-  int i = 0;
-  while (i++ < 1) {
-
+  
     if (who == READER) {
       acquire(&lk);
       readers_count++;
+      cprintf("Reader PID %d: behind while\n", myproc()->pid);
+
       while (is_writing)
         sleep(&r_bed, &lk);
+
+      cprintf("Reader PID %d: passed while\n", myproc()->pid);
+
       is_reading++;
       release(&lk);
 
-      cprintf("Reader PID %d: read %d\n", myproc()->pid, w);
+      cprintf("Reader PID %d: reading started\n", myproc()->pid);
+      for (int i = 0 ; i < 1000000000 ; i++);
+      cprintf("Reader PID %d: reading done\n", myproc()->pid);
 
       acquire(&lk);
       is_reading--;
       readers_count--;
+      cprintf("Reader PID %d: exiting\n", myproc()->pid);
       wakeup(&r_bed);
       release(&lk);
     }
@@ -1032,20 +1036,77 @@ rw_exec(int who)
       acquire(&lk);
       if (readers_count > 0)
         sleep(&r_bed, &lk);
+
+      cprintf("Writer PID %d: behind while\n", myproc()->pid);
       while (is_reading || is_writing)
         sleep(&r_bed, &lk);
+
+      cprintf("Writer PID %d: passed while\n", myproc()->pid);
       is_writing++;
       release(&lk);
 
-      w++;
-      cprintf("Writer PID %d: wrote %d\n", myproc()->pid, w);
+
+      cprintf("Writer PID %d: writing started\n", myproc()->pid);
+      for (int i = 0 ; i < 1000000000 ; i++);
+      cprintf("Writer PID %d: writing done\n", myproc()->pid);
 
       acquire(&lk);
       is_writing--;
+      cprintf("Writer PID %d: exiting\n", myproc()->pid);
       wakeup(&r_bed);
       release(&lk);
     }
-  }
+  
+}
+
+void 
+wr_exec(int who)
+{
+
+    if (who == WRITER) {
+        acquire(&lk);
+        writers_count++;
+        cprintf("Writer PID %d: behind while\n", myproc()->pid);
+        while (is_writing)
+          sleep(&r_bed, &lk);
+        cprintf("Writer PID %d: passed while\n", myproc()->pid);
+        is_writing++;
+        release(&lk);
+
+        cprintf("Writer PID %d: writing started\n", myproc()->pid);
+        for (int i = 0 ; i < 1000000000 ; i++);
+        cprintf("Writer PID %d: writing done\n", myproc()->pid);
+
+        acquire(&lk);
+        is_writing--;
+        writers_count--;
+        cprintf("Writer PID %d: exiting\n", myproc()->pid);
+        wakeup(&r_bed);
+        release(&lk);
+    }
+
+    else if (who == READER) {
+        acquire(&lk);
+        readers_count++;
+        cprintf("Reader PID %d: behind while\n", myproc()->pid);
+        while (is_writing)
+          sleep(&r_bed, &lk);
+        cprintf("Reader PID %d: passed while\n", myproc()->pid);
+        is_reading++;
+        release(&lk);
+
+
+        cprintf("Reader PID %d: reading started\n", myproc()->pid);
+        for (int i = 0 ; i < 1000000000 ; i++);
+        cprintf("Reader PID %d: reading done\n", myproc()->pid);
+
+        acquire(&lk);
+        is_reading--;
+        readers_count--;
+        cprintf("Reader PID %d: exiting\n", myproc()->pid);
+        wakeup(&r_bed);
+        release(&lk);
+    }
 }
 
 void
@@ -1068,18 +1129,19 @@ rwtest(int pattern)
   for(int i = digit_count - 1; i >= 0; i--)
     cprintf("%d", reader_writers[i]);
 
+  cprintf("\n");
   // rw_exec(reader_writers[0]);
-
+  
   for (int i = 0; i < digit_count - 1; i++)
   {
-    int pid = fork();
-    cprintf("fork output = %d.\n", pid);
+    int pid = 1;
+    //cprintf("fork output = %d.\n", pid);
     if (pid == 0) {
-      reader_writers[i]++;
-      cprintf("DAnesh is here.\n");
+      cprintf("child of fork()\n");
       rw_exec(reader_writers[i]);
       exit();
     }
   }
   while(wait() > -1);
+  
 }
