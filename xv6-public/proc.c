@@ -1003,10 +1003,10 @@ int is_writing = 0;
 int is_reading = 0;
 
 void 
-rw_exec(int who)
+rw_exec(int type)
 {
   
-    if (who == READER) {
+    if (type == READER) {
       acquire(&lk);
       readers_count++;
       cprintf("Reader PID %d: behind while\n", myproc()->pid);
@@ -1020,7 +1020,6 @@ rw_exec(int who)
       release(&lk);
 
       cprintf("Reader PID %d: reading started\n", myproc()->pid);
-      for (int i = 0 ; i < 1000000000 ; i++);
       cprintf("Reader PID %d: reading done\n", myproc()->pid);
 
       acquire(&lk);
@@ -1032,13 +1031,13 @@ rw_exec(int who)
     }
 
 
-    else if (who == WRITER) {
+    else if (type == WRITER) {
       acquire(&lk);
-      if (readers_count > 0)
-        sleep(&r_bed, &lk);
+      // if (readers_count > 0)
+      //   sleep(&r_bed, &lk);
 
       cprintf("Writer PID %d: behind while\n", myproc()->pid);
-      while (is_reading || is_writing)
+      while (is_reading || is_writing || readers_count)
         sleep(&r_bed, &lk);
 
       cprintf("Writer PID %d: passed while\n", myproc()->pid);
@@ -1047,7 +1046,9 @@ rw_exec(int who)
 
 
       cprintf("Writer PID %d: writing started\n", myproc()->pid);
-      for (int i = 0 ; i < 1000000000 ; i++);
+      
+      set_sleep(3);
+
       cprintf("Writer PID %d: writing done\n", myproc()->pid);
 
       acquire(&lk);
@@ -1060,21 +1061,21 @@ rw_exec(int who)
 }
 
 void 
-wr_exec(int who)
+wr_exec(int type)
 {
 
-    if (who == WRITER) {
+    if (type == WRITER) {
         acquire(&lk);
         writers_count++;
         cprintf("Writer PID %d: behind while\n", myproc()->pid);
-        while (is_writing)
+        while (is_writing || is_reading)
           sleep(&r_bed, &lk);
         cprintf("Writer PID %d: passed while\n", myproc()->pid);
         is_writing++;
         release(&lk);
 
         cprintf("Writer PID %d: writing started\n", myproc()->pid);
-        for (int i = 0 ; i < 1000000000 ; i++);
+        
         cprintf("Writer PID %d: writing done\n", myproc()->pid);
 
         acquire(&lk);
@@ -1085,11 +1086,11 @@ wr_exec(int who)
         release(&lk);
     }
 
-    else if (who == READER) {
+    else if (type == READER) {
         acquire(&lk);
         readers_count++;
         cprintf("Reader PID %d: behind while\n", myproc()->pid);
-        while (is_writing)
+        while (is_writing || writers_count)
           sleep(&r_bed, &lk);
         cprintf("Reader PID %d: passed while\n", myproc()->pid);
         is_reading++;
@@ -1097,7 +1098,7 @@ wr_exec(int who)
 
 
         cprintf("Reader PID %d: reading started\n", myproc()->pid);
-        for (int i = 0 ; i < 1000000000 ; i++);
+        set_sleep(3);
         cprintf("Reader PID %d: reading done\n", myproc()->pid);
 
         acquire(&lk);
@@ -1120,7 +1121,7 @@ rwtest(int pattern)
     digit_count++;
   }
 
-  int reader_writers[digit_count];
+  int reader_writers[20];
   for (int i = 0; i < digit_count; i++)
   {
     reader_writers[i] = ((1 << i) & (pattern)) ? 1 : 0;
