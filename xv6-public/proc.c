@@ -1239,8 +1239,24 @@ shm_detach(int id)
   }
 }
 
+// IPC_SET: 0
+// IPC_STAT: 1
+// IPC_RMID: 2
+
 void
 shm_ctl(int shmid, int cmd, struct shmid_ds* buf)
 {
-  
+  if (cmd == 0)
+  {
+    shm_table[shmid].perm_info.mode = buf->perm_info.mode;
+  }
+  else if (cmd == 1)
+  {
+    buf->perm_info.id = shm_table[shmid].perm_info.id;
+    buf->perm_info.mode = shm_table[shmid].perm_info.mode;
+  }
+  else
+  {
+    shm_table[shmid].marked = 1;
+  }
 }
