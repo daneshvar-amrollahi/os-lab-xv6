@@ -1196,7 +1196,7 @@ shm_getat(int id)
     shm_table[id].frame = mem;
     shm_table[id].ref_count++;
     shm_table[id].perm_info.id = id;
-    // shm_table[id].perm_info.mode = bahman;
+    // shm_table[id].perm_info.mode = folan??;
   }
   else
   {
@@ -1218,5 +1218,16 @@ shm_getat(int id)
 void
 shm_detach(int id)
 {
-  
+  struct proc* proc = myproc();
+  if(shm_table[id].perm_info.id == id)
+  {
+    shm_table[id].ref_count--;
+    int i = 0;
+    for (i = 0; i < MAX_ATTACHED_PROCS; i++)
+    {
+      if (shm_table[id].attached_processes[i] == proc->pid)
+        shm_table[id].attached_processes[i] = -1;
+    }
+    // delete if marked and ref_count = 0
+  }
 }
