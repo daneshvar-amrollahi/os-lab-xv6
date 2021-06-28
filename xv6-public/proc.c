@@ -8,6 +8,9 @@
 //#include "spinlock.h"
 #include "bed.h"
 
+#define MAX_ATTACHED_PROCS 8
+#define SHM_COUNT 8
+
 #define READER 0
 #define WRITER 1
 
@@ -1147,8 +1150,35 @@ rwtest(int pattern)
   
 }
 
+struct ipc_perm
+{
+  int id;
+  int mode;
+};
+
+struct shmid_ds
+{
+  struct ipc_perm perm_info;
+  int ref_count;
+  int attached_processes[MAX_ATTACHED_PROCS];
+  uint frame;
+};
+
+struct shmid_ds shm_table[SHM_COUNT];
+
+void shm_init(void)
+{
+  int i = 0;
+  for (i = 0; i < SHM_COUNT; i++) {
+    shm_table[i].ref_count = 0;
+    shm_table[i].perm_info.id = -1;
+  }
+}
+
 void
 shm_getat(int id)
 {
-  
+  // pde_t *pgdir;
+
+
 }

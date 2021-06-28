@@ -135,6 +135,7 @@ void            rwtest(int);
 void			rw_exec(int);
 void            wr_exec(int);
 void            shm_getat(int);
+void            shm_init(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -7,24 +7,8 @@
 #include "proc.h"
 #include "elf.h"
 
-#define MAX_ATTACHED_PROCS 8
-
 extern char data[];  // defined by kernel.ld
 pde_t *kpgdir;  // for use in scheduler()
-
-struct ipc_perm
-{
-  int id;
-  int mode;
-};
-
-struct shmid_ds
-{
-  struct ipc_perm perm_info;
-  int ref_count;
-  int attached_processes[MAX_ATTACHED_PROCS];
-  uint frame;
-};
 
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
