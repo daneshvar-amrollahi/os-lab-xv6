@@ -1188,6 +1188,8 @@ shm_getat(int id)
   struct proc* proc = myproc();
   pde_t *pgdir = proc->pgdir;
   uint shm = proc->shm;
+  if (shm_table[id].marked == 1)
+    return;
   if (shm_table[id].ref_count == 0)
   {
     char* mem;
