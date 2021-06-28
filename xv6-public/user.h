@@ -38,6 +38,7 @@ void rwtest(int);
 void rw_exec(int);
 void wr_exec(int);
 void shm_getat(int);
+void shm_detach(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

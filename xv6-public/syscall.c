@@ -118,6 +118,7 @@ extern int sys_rwtest(void);
 extern int sys_rw_exec(void);
 extern int sys_wr_exec(void);
 extern int sys_shm_getat(void);
+extern int sys_shm_detach(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -156,6 +157,7 @@ static int (*syscalls[])(void) = {
 [SYS_rw_exec] sys_rw_exec,
 [SYS_wr_exec] sys_wr_exec,
 [SYS_shm_getat] sys_shm_getat,
+[SYS_shm_detach] sys_shm_detach,
 };
 
 void

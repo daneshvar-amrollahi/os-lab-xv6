@@ -215,3 +215,11 @@ sys_shm_getat(void)
   argint(0, &id);
   shm_getat(id);
 }
+
+void
+sys_shm_detach(void)
+{
+  int id;
+  argint(0, &id);
+  shm_detach(id);
+}

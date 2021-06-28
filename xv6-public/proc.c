@@ -1214,3 +1214,9 @@ shm_getat(int id)
     }
   }  
 }
+
+void
+shm_detach(int id)
+{
+  
+}
