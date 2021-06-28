@@ -1146,3 +1146,9 @@ rwtest(int pattern)
   while(wait() > -1);
   
 }
+
+void
+shm_getat(int id)
+{
+  
+}

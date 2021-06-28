@@ -117,6 +117,7 @@ extern int sys_multiple_acquire(void);
 extern int sys_rwtest(void);
 extern int sys_rw_exec(void);
 extern int sys_wr_exec(void);
+extern int sys_shm_getat(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -154,6 +155,7 @@ static int (*syscalls[])(void) = {
 [SYS_rwtest] sys_rwtest,
 [SYS_rw_exec] sys_rw_exec,
 [SYS_wr_exec] sys_wr_exec,
+[SYS_shm_getat] sys_shm_getat,
 };
 
 void

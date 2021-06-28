@@ -134,6 +134,7 @@ void            multiple_acquire(int);
 void            rwtest(int);
 void			rw_exec(int);
 void            wr_exec(int);
+void            shm_getat(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -34,3 +34,4 @@
 #define SYS_rwtest 33
 #define SYS_rw_exec 34
 #define SYS_wr_exec 35
+#define SYS_shm_getat 36

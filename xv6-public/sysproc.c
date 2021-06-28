@@ -207,3 +207,11 @@ sys_rwtest(void) //not working now
   argint(0, &pattern);
   rwtest(pattern);
 }
+
+void
+sys_shm_getat(void)
+{
+  int id;
+  argint(0, &id);
+  shm_getat(id);
+}
