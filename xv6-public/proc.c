@@ -1238,3 +1238,9 @@ shm_detach(int id)
     }
   }
 }
+
+void
+shm_ctl(int shmid, int cmd, struct shmid_ds* buf)
+{
+  
+}

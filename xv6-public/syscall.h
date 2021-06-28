@@ -36,3 +36,4 @@
 #define SYS_wr_exec 35
 #define SYS_shm_getat 36
 #define SYS_shm_detach 37
+#define SYS_shm_ctl 38

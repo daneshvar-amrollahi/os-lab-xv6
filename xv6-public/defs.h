@@ -9,6 +9,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct shmid_ds;
 
 // bio.c
 void            binit(void);
@@ -137,6 +138,7 @@ void            wr_exec(int);
 void            shm_getat(int);
 void            shm_init(void);
 void            shm_detach(int);
+void            shm_ctl(int, int, struct shmid_ds*);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

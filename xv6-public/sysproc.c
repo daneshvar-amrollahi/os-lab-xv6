@@ -223,3 +223,15 @@ sys_shm_detach(void)
   argint(0, &id);
   shm_detach(id);
 }
+void
+sys_shm_ctl(void)
+{
+  int shmid;
+  int cmd;
+  argint(0, &shmid);
+  argint(1, &cmd);
+
+  struct shmid_ds* buf;
+  argptr (2, (void*)&buf , sizeof(buf));
+  shm_ctl(shmid, cmd, buf);
+}

@@ -39,6 +39,7 @@ void rw_exec(int);
 void wr_exec(int);
 void shm_getat(int);
 void shm_detach(int);
+void shm_ctl(int, int, struct shmid_ds*);
 
 // ulib.c
 int stat(const char*, struct stat*);
