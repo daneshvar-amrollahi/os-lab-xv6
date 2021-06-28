@@ -1163,6 +1163,7 @@ struct shmid_ds
   int ref_count;
   int attached_processes[MAX_ATTACHED_PROCS];
   char* frame;
+  int marked;
 };
 
 struct shmid_ds shm_table[SHM_COUNT];
@@ -1172,6 +1173,7 @@ void shm_init(void)
   int i = 0;
   for (i = 0; i < SHM_COUNT; i++) {
     shm_table[i].ref_count = 0;
+    shm_table[i].marked = 0;
     int j = 0;
     for (j = 0; j < MAX_ATTACHED_PROCS; j++)
     {
@@ -1228,6 +1230,11 @@ shm_detach(int id)
       if (shm_table[id].attached_processes[i] == proc->pid)
         shm_table[id].attached_processes[i] = -1;
     }
-    // delete if marked and ref_count = 0
+    if (shm_table[id].ref_count == 0 && shm_table[id].marked == 1)
+    {
+        uint* pte = walkpgdir(proc->pgdir, shm_table[id].frame, 0);
+        uint addr_in_ptable = PTE_ADDR(*pte);
+        kfree((char*)addr_in_ptable);
+    }
   }
 }

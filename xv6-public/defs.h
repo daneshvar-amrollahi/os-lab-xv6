@@ -192,6 +192,7 @@ void            seginit(void);
 void            kvmalloc(void);
 pde_t*          setupkvm(void);
 int             mappages(pde_t *, void *, uint, uint, int);
+uint*         walkpgdir(pde_t *, const void *, int);
 char*           uva2ka(pde_t*, char*);
 int             allocuvm(pde_t*, uint, uint);
 int             deallocuvm(pde_t*, uint, uint);
