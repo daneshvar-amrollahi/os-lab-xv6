@@ -57,6 +57,7 @@ struct proc {
   int executed_cycle_ratio;
   float exec_cycle;
   int last_cpu_time;
+  uint shm;
 };
 
 // Process memory is laid out contiguously, low addresses first:

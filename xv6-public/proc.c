@@ -109,6 +109,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->queue = 1; //default: RR
+  p->shm = 0;
   p->exec_cycle = 0;
   p->last_cpu_time = 0;
 
@@ -1161,7 +1162,7 @@ struct shmid_ds
   struct ipc_perm perm_info;
   int ref_count;
   int attached_processes[MAX_ATTACHED_PROCS];
-  uint frame;
+  char* frame;
 };
 
 struct shmid_ds shm_table[SHM_COUNT];
@@ -1171,14 +1172,45 @@ void shm_init(void)
   int i = 0;
   for (i = 0; i < SHM_COUNT; i++) {
     shm_table[i].ref_count = 0;
-    shm_table[i].perm_info.id = -1;
+    int j = 0;
+    for (j = 0; j < MAX_ATTACHED_PROCS; j++)
+    {
+      shm_table[i].attached_processes[j] = -1;
+    }
   }
 }
 
 void
 shm_getat(int id)
 {
-  // pde_t *pgdir;
+  struct proc* proc = myproc();
+  pde_t *pgdir =proc->pgdir;
+  uint shm = proc->shm;
+  if (shm_table[id].ref_count == 0)
+  {
+    char* mem;
+    mem = kalloc();
 
+    memset(mem, 0, PGSIZE);
+    mappages(pgdir, (char*)shm, PGSIZE, V2P(mem), PTE_W|PTE_U);
+    shm_table[id].frame = mem;
+    shm_table[id].ref_count++;
+    shm_table[id].perm_info.id = id;
+    // shm_table[id].perm_info.mode = bahman;
+  }
+  else
+  {
+    mappages(pgdir, (char*)shm, PGSIZE, V2P(shm_table[id].frame), PTE_W|PTE_U);
 
+    shm_table[id].ref_count++;
+    proc->shm = shm;
+  }
+  int i = 0;
+  for (i = 0; i < MAX_ATTACHED_PROCS; i++)
+  {
+    if (shm_table[id].attached_processes[i] == -1)
+    {
+      shm_table[id].attached_processes[i] = proc->pid;
+    }
+  }  
 }
